@@ -14,7 +14,7 @@ class ServerComm:
     def setup(self):
         print('[INFO] Connecting to server...')
         self._sio.connect(
-                'http://localhost:5000', namespaces=['/cv'])
+                'http://10.19.191.50:5000', namespaces=['/cv'])
         print('[INFO] Successfully connected to server.')
         time.sleep(1)
 
