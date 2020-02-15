@@ -376,21 +376,21 @@ class App:
         while True:
             frame = self._video_stream.read()
 
-            self._update_detect_process(frame)
+            # self._update_detect_process(frame)
 
-            results = self._process_results()
+            # results = self._process_results()
 
-            self._print_date_and_time(frame)
+            # self._print_date_and_time(frame)
 
-            frame = edgeiq.markup_image(
-                    frame, results["predictions"], colors=self._default_color)
+            # frame = edgeiq.markup_image(
+                    # frame, results["predictions"], colors=self._default_color)
             self._video_writer.update(frame)
 
             if not self._use_streamer:
                 web_frame = frame.copy()
-                if self._video_writer.state != 'Idle':
+                # if self._video_writer.state != 'Idle':
                     # Add recording circle to image
-                    cv2.circle(web_frame, (620, 20), 15, (0, 0, 255), -1)
+                    # cv2.circle(web_frame, (620, 20), 15, (0, 0, 255), -1)
                 self._server_comm.send_frame(web_frame)
 
             self._handle_video_complete_event()

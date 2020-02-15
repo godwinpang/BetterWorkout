@@ -32,16 +32,18 @@ class ServerComm:
         self._sio.emit('cv-cmd', {'cmd': 'update_frame', 'data': frame})
 
     def send_notify_db_update(self):
-        self._sio.emit('cv-cmd', {'cmd': 'notify_db_update'})
+        return
+        # self._sio.emit('cv-cmd', {'cmd': 'notify_db_update'})
 
     def send_update_camera_stats(self, fps, inf_time):
-        self._sio.emit(
-                'cv-cmd',
-                {
-                    'cmd': 'update_camera_stats',
-                    'fps': fps,
-                    'inf_time': inf_time
-                    })
+        return
+        # self._sio.emit(
+        #         'cv-cmd',
+        #         {
+        #             'cmd': 'update_camera_stats',
+        #             'fps': fps,
+        #             'inf_time': inf_time
+        #             })
 
     def close(self):
         self._sio.disconnect()
