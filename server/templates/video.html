@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+      <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">
+              Event Playback
+              <a href="/data/{{ video_path }}" download>
+                <i class="material-icons user-button">file_download</i>
+              </a>
+              <i class="material-icons user-button" id="delete-video">delete_forever</i>
+            </h5>
+          <div class="card-scroller">
+            <p><b>Date:</b> {{ date }}</p>
+            <p><b>Time:</b> {{ time }}</p>
+            <p><b>People detected:</b> {{ num_people }}</p>
+            <p><b>Filename:</b> {{ video_filename }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="width: 70%">
+        <video width="640" height="480" controls>
+          <source src="/data/{{ video_path }}" type="video/mp4">
+          Video not supported
+        </video>
+      </div>
+{% endblock %}
+
+{% block script %}
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    const status_elem = document.getElementById("camera-status");
+    const delete_elem = document.getElementById("delete-video");
+
+    id = window.location.href.split("/").pop();
+
+    const socket = io('http://' + document.domain + ':' + location.port, {
+      reconnection: false
+    });
+    const content_socket = io('/web-content')
+
+    content_socket.on('connect', () => {
+      console.log('Connected');
+    });
+
+    content_socket.on('connect_error', (error) => {
+      console.log('Connect error! ' + error);
+    });
+
+    content_socket.on('connect_timeout', (error) => {
+      console.log('Connect timeout! ' + error);
+    });
+
+    content_socket.on('error', (error) => {
+      console.log('Error! ' + error);
+    });
+
+    content_socket.on('web-data', (msg) => {
+      if (msg.cmd == 'update_status') {
+        status_elem.innerHTML = "<b>Camera Status:</b> " + msg.data;
+        console.log('Camera Status: ' + msg.data)
+      }
+    });
+
+    delete_elem.addEventListener("click", function() {
+      content_socket.emit('user-cmd', { cmd: 'delete', data: id });
+      console.log('Deleted ' + id);
+      window.location.href = "/";
+    });
+  });
+</script>
+{% endblock %}

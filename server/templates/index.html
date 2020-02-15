@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+      <div class="card">
+        <div class="card-body">
+          <div class="card-scroller">
+            <h5 class="card-title">Camera Stats</h5>
+            <div id="camera-stats"></div>
+            <h5 class="card-title">Recorded Events</h5>
+            <div id="video-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width: 70%">
+        <img id="live-feed" src="">
+      </div>
+{% endblock %}
+
+{% block script %}
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    const status_elem = document.getElementById("camera-status");
+
+    const image_elem = document.getElementById("live-feed");
+    const camera_stats_elem = document.getElementById("camera-stats");
+    const video_list_elem = document.getElementById("video-list");
+
+    const socket = io('http://' + document.domain + ':' + location.port, {
+      reconnection: false
+    });
+    const content_socket = io('/web-content')
+    const stream_socket = io('/web-stream')
+
+    content_socket.on('connect', () => {
+      console.log('Connected to content namespace');
+      content_socket.emit('user-cmd', { cmd: 'query_db' });
+    });
+
+    stream_socket.on('connect', () => {
+      console.log('Connected to stream namespace');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.log('Connect error! ' + error);
+    });
+
+    socket.on('connect_timeout', (error) => {
+      console.log('Connect timeout! ' + error);
+    });
+
+    socket.on('error', (error) => {
+      console.log('Error! ' + error);
+    });
+
+    stream_socket.on('web-data', (msg) => {
+      if (msg.cmd == 'update_frame') {
+        image_elem.src = msg.data;
+
+      } else if (msg.cmd == 'update_camera_stats') {
+        console.log('Rx camera stats update');
+        text = '<p>FPS: ' + msg.fps + '</p>';
+        text += '<p>Inference Time: ' + msg.inf_time + ' s</p>';
+        camera_stats_elem.innerHTML = text;
+      }
+    });
+
+    content_socket.on('web-data', (msg) => {
+      if (msg.cmd == 'update_text') {
+        console.log('Rx text update');
+        text = '';
+
+        // List dates with most recent on top
+        var dates = Object.keys(msg.data);
+        dates.sort().reverse();
+        for (var i = 0; i < dates.length; i++) {
+          var date = dates[i];
+          text += '<div class="selection">';
+          text += '<a data-toggle="collapse" href="#date-' + date + '">';
+          text += date;
+          text += '</a></div>';
+
+          // Expand most recent date
+          var show = '';
+          if (i == 0) {
+            show = ' show';
+          }
+          text += '<div class="collapse' + show + '" id="date-' + date + '">';
+
+          // Times are already in sorted order
+          for (var j = 0; j < msg.data[date].length; j++) {
+            var video = msg.data[date][j];
+            var description = '- ' + video.time + ' - ';
+            if (video.num_people == 1) {
+              description += '1 person';
+            } else {
+              description += video.num_people + ' people';
+            }
+            var video_url = '/video/' + video.id;
+            text += '<p><a href="' + video_url + '">' + description + ' </a></p>';
+          }
+          text += '</div>';
+        }
+        video_list_elem.innerHTML = text;
+
+      } else if (msg.cmd == 'update_status') {
+        console.log('Rx camera status update')
+        status_elem.innerHTML = "<b>Camera Status:</b> " + msg.data;
+
+      } else if (msg.cmd == 'notify_db_update') {
+        console.log('Rx db update')
+        content_socket.emit('user-cmd', { cmd: 'query_db' })
+      }
+    });
+  });
+</script>
+{% endblock %}

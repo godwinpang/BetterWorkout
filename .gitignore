@@ -1,0 +1,7 @@
+alwaysai.target.json
+venv/
+tags
+*.avi
+*.mp4
+*.db
+__pycache__
