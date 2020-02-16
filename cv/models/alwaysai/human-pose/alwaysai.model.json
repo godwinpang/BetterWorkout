@@ -1,0 +1,30 @@
+{
+  "id": "alwaysai/human-pose",
+  "accuracy": "",
+  "description": "Model identifies human poses for persons in image. Requires Intel Neural Compute Stick (NCS) to run.",
+  "inference_time": 0,
+  "license": "Apache-2.0",
+  "mean_average_precision_top_1": 0,
+  "mean_average_precision_top_5": 0,
+  "public": true,
+  "website_url": "",
+  "dataset": "COCO",
+  "model_parameters": {
+    "framework_type": "caffe",
+    "config_file": "human-pose-estimation-0001.xml",
+    "size": [
+      456,
+      256
+    ],
+    "model_file": "human-pose-estimation-0001.bin",
+    "scalefactor": 1,
+    "crop": false,
+    "purpose": "PoseEstimation",
+    "mean": [
+      0,
+      0,
+      0
+    ]
+  },
+  "version": 6
+}
