@@ -54,8 +54,6 @@ def main():
         with edgeiq.WebcamVideoStream(cam=0) as video_stream:
             time.sleep(2.0)
             fps.start()
-
-            results = None
             while True:
                 frame = video_stream.read()
                 server_comm.send_frame(frame)
